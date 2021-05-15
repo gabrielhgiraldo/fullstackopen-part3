@@ -5,3 +5,30 @@ content-type: application/json
     "name": "sample mcsamplesteen",
     "number":"603-234-1234"
 }
+
+### duplicate person
+POST http://localhost:3001/api/persons HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Arto Hellas",
+    "number":"603-234-1234"
+}
+
+### missing name
+POST http://localhost:3001/api/persons HTTP/1.1
+content-type: application/json
+
+{
+    "name": "",
+    "number":"603-234-1234"
+}
+
+### missing number
+POST http://localhost:3001/api/persons HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Arto Hellas",
+    "number":""
+}

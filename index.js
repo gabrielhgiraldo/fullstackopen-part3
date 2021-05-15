@@ -26,6 +26,10 @@ let persons = [
     }
 ]
 
+const generateId = () => {
+    return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+}
+
 app.get('/info', (request, response) => {
     response.send((
         `
@@ -55,8 +59,29 @@ app.delete('/api/persons/:id', (request, response) => {
     response.status(204).end()
 })
 app.post('/api/persons', (request, response) => {
-    const person = request.body
-    person.id = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+    const body = request.body
+
+    if (!body.name) {
+        return response.status(400).json({
+            error:'name is missing'
+        })
+    }
+    if (!body.number) {
+        return response.status(400).json({
+            error:'number is missing'
+        })
+    }
+    if(persons.find(person => person.name === body.name)){
+        return response.status(409).json({
+            error:`name must be unique`
+        })
+    }
+
+    const person = {
+        name: body.name,
+        number: body.number,
+        id: generateId()
+    }
 
     persons = persons.concat(person)
     
