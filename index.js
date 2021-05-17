@@ -37,10 +37,6 @@ let persons = [
     }
 ]
 
-const generateId = () => {
-    return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
-}
-
 app.get('/info', (request, response) => {
     response.send((
         `
@@ -82,21 +78,15 @@ app.post('/api/persons', (request, response) => {
             error:'number is missing'
         })
     }
-    if(persons.find(person => person.name === body.name)){
-        return response.status(409).json({
-            error:`name must be unique`
-        })
-    }
 
-    const person = {
+    const person = new Person({
         name: body.name,
-        number: body.number,
-        id: generateId()
-    }
-
-    persons = persons.concat(person)
+        number: body.number
+    })
     
-    response.json(person)
+    person.save().then(result => {
+        response.json(person)
+    })
 })
 
 const PORT = process.env.PORT
