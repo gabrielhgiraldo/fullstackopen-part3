@@ -11,8 +11,8 @@ const Person = require('./models/person')
 
 app.use(express.static('build'))
 app.use(cors())
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
 app.use(express.json())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
 
 let persons = [
     { 
@@ -60,10 +60,14 @@ app.get('/api/persons/:id', (request, response) => {
     }
 })
 app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    persons = persons.filter(person => person.id !== id)
-
-    response.status(204).end()
+    Person.findByIdAndRemove(request.params.id)
+        .then(result => {
+            response.status(204).end()
+        })
+        .catch(error => {
+            console.log(error)
+            response.status(400).send({ error: 'malformatted id' })
+        })
 })
 app.post('/api/persons', (request, response) => {
     const body = request.body
@@ -83,11 +87,17 @@ app.post('/api/persons', (request, response) => {
         name: body.name,
         number: body.number
     })
-    
+
     person.save().then(result => {
         response.json(person)
     })
 })
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
